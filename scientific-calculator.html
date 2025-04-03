@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .calculator-btn {
+            transition: all 0.2s;
+        }
+        .calculator-btn:active {
+            transform: scale(0.95);
+        }
+        .operation-btn {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .function-btn {
+            background-color: #10b981;
+            color: white;
+        }
+        .equals-btn {
+            background-color: #f59e0b;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-purple-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-md">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Calculator Display -->
+            <div class="p-4 bg-gray-800 text-right">
+                <div id="previousOperation" class="text-gray-400 text-sm h-5 overflow-hidden"></div>
+                <div id="currentOperation" class="text-white text-3xl font-mono overflow-x-auto whitespace-nowrap">0</div>
+            </div>
+
+            <!-- Calculator Buttons -->
+            <div class="grid grid-cols-5 gap-2 p-4">
+                <!-- Row 1 -->
+                <button onclick="clearAll()" class="calculator-btn col-span-2 bg-red-500 text-white py-3 rounded-lg font-medium">AC</button>
+                <button onclick="backspace()" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">⌫</button>
+                <button onclick="appendOperation('/')" class="calculator-btn operation-btn py-3 rounded-lg font-medium">÷</button>
+                <button onclick="appendOperation('*')" class="calculator-btn operation-btn py-3 rounded-lg font-medium">×</button>
+
+                <!-- Row 2 -->
+                <button onclick="appendNumber('7')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">7</button>
+                <button onclick="appendNumber('8')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">8</button>
+                <button onclick="appendNumber('9')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">9</button>
+                <button onclick="appendOperation('-')" class="calculator-btn operation-btn py-3 rounded-lg font-medium">-</button>
+                <button onclick="squareRoot()" class="calculator-btn function-btn py-3 rounded-lg font-medium">√</button>
+
+                <!-- Row 3 -->
+                <button onclick="appendNumber('4')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">4</button>
+                <button onclick="appendNumber('5')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">5</button>
+                <button onclick="appendNumber('6')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">6</button>
+                <button onclick="appendOperation('+')" class="calculator-btn operation-btn py-3 rounded-lg font-medium">+</button>
+                <button onclick="power()" class="calculator-btn function-btn py-3 rounded-lg font-medium">x^y</button>
+
+                <!-- Row 4 -->
+                <button onclick="appendNumber('1')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">1</button>
+                <button onclick="appendNumber('2')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">2</button>
+                <button onclick="appendNumber('3')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">3</button>
+                <button onclick="percentage()" class="calculator-btn function-btn py-3 rounded-lg font-medium">%</button>
+                <button onclick="factorial()" class="calculator-btn function-btn py-3 rounded-lg font-medium">x!</button>
+
+                <!-- Row 5 -->
+                <button onclick="appendNumber('0')" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">0</button>
+                <button onclick="appendDecimal()" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">.</button>
+                <button onclick="toggleSign()" class="calculator-btn bg-gray-200 py-3 rounded-lg font-medium">+/-</button>
+                <button onclick="calculate()" class="calculator-btn equals-btn py-3 rounded-lg font-medium col-span-2">=</button>
+            </div>
+
+            <!-- Scientific Functions -->
+            <div class="grid grid-cols-5 gap-2 px-4 pb-4">
+                <button onclick="sin()" class="calculator-btn function-btn py-2 rounded-lg text-sm">sin</button>
+                <button onclick="cos()" class="calculator-btn function-btn py-2 rounded-lg text-sm">cos</button>
+                <button onclick="tan()" class="calculator-btn function-btn py-2 rounded-lg text-sm">tan</button>
+                <button onclick="log()" class="calculator-btn function-btn py-2 rounded-lg text-sm">log</button>
+                <button onclick="ln()" class="calculator-btn function-btn py-2 rounded-lg text-sm">ln</button>
+
+                <button onclick="asin()" class="calculator-btn function-btn py-2 rounded-lg text-sm">sin⁻¹</button>
+                <button onclick="acos()" class="calculator-btn function-btn py-2 rounded-lg text-sm">cos⁻¹</button>
+                <button onclick="atan()" class="calculator-btn function-btn py-2 rounded-lg text-sm">tan⁻¹</button>
+                <button onclick="pi()" class="calculator-btn function-btn py-2 rounded-lg text-sm">π</button>
+                <button onclick="e()" class="calculator-btn function-btn py-2 rounded-lg text-sm">e</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentOperation = '0';
+        let previousOperation = '';
+        let operation = undefined;
+        let resetScreen = false;
+
+        // Display elements
+        const currentOperationScreen = document.getElementById('currentOperation');
+        const previousOperationScreen = document.getElementById('previousOperation');
+
+        // Number buttons
+        function appendNumber(number) {
+            if (currentOperation === '0' || resetScreen) {
+                currentOperation = number;
+                resetScreen = false;
+            } else {
+                currentOperation += number;
+            }
+            updateDisplay();
+        }
+
+        // Decimal button
+        function appendDecimal() {
+            if (resetScreen) {
+                currentOperation = '0.';
+                resetScreen = false;
+                return;
+            }
+            if (currentOperation.includes('.')) return;
+            currentOperation += '.';
+            updateDisplay();
+        }
+
+        // Operation buttons
+        function appendOperation(op) {
+            if (currentOperation === '') return;
+            if (previousOperation !== '') {
+                calculate();
+            }
+            operation = op;
+            previousOperation = currentOperation;
+            currentOperation = '';
+            updateDisplay();
+        }
+
+        // Equals button
+        function calculate() {
+            let computation;
+            const prev = parseFloat(previousOperation);
+            const current = parseFloat(currentOperation);
+            
+            if (isNaN(prev) || isNaN(current)) return;
+            
+            switch (operation) {
+                case '+':
+                    computation = prev + current;
+                    break;
+                case '-':
+                    computation = prev - current;
+                    break;
+                case '*':
+                    computation = prev * current;
+                    break;
+                case '/':
+                    computation = prev / current;
+                    break;
+                case '^':
+                    computation = Math.pow(prev, current);
+                    break;
+                default:
+                    return;
+            }
+            
+            currentOperation = computation.toString();
+            operation = undefined;
+            previousOperation = '';
+            resetScreen = true;
+            updateDisplay();
+        }
+
+        // Clear button
+        function clearAll() {
+            currentOperation = '0';
+            previousOperation = '';
+            operation = undefined;
+            updateDisplay();
+        }
+
+        // Backspace button
+        function backspace() {
+            if (currentOperation.length === 1 || (currentOperation.length === 2 && currentOperation.startsWith('-'))) {
+                currentOperation = '0';
+            } else {
+                currentOperation = currentOperation.slice(0, -1);
+            }
+            updateDisplay();
+        }
+
+        // Toggle sign button
+        function toggleSign() {
+            if (currentOperation === '0') return;
+            currentOperation = currentOperation.startsWith('-') ? 
+                currentOperation.substring(1) : '-' + currentOperation;
+            updateDisplay();
+        }
+
+        // Percentage button
+        function percentage() {
+            currentOperation = (parseFloat(currentOperation) / 100).toString();
+            updateDisplay();
+        }
+
+        // Scientific functions
+        function squareRoot() {
+            currentOperation = Math.sqrt(parseFloat(currentOperation)).toString();
+            updateDisplay();
+        }
+
+        function power() {
+            operation = '^';
+            previousOperation = currentOperation;
+            currentOperation = '';
+            updateDisplay();
+        }
+
+        function factorial() {
+            let num = parseFloat(currentOperation);
+            if (num < 0 || !Number.isInteger(num)) {
+                currentOperation = 'Error';
+                updateDisplay();
+                return;
+            }
+            let result = 1;
+            for (let i = 2; i <= num; i++) {
+                result *= i;
+            }
+            currentOperation = result.toString();
+            updateDisplay();
+        }
+
+        function sin() {
+            currentOperation = Math.sin(parseFloat(currentOperation)).toString();
+            updateDisplay();
+        }
+
+        function cos() {
+            currentOperation = Math.cos(parseFloat(currentOperation)).toString();
+            updateDisplay();
+        }
+
+        function tan() {
+            currentOperation = Math.tan(parseFloat(currentOperation)).toString();
+            updateDisplay();
+        }
+
+        function asin() {
+            currentOperation = Math.asin(parseFloat(currentOperation)).toString();
+            updateDisplay();
+        }
+
+        function acos() {
+            currentOperation = Math.acos(parseFloat(currentOperation)).toString();
+            updateDisplay();
+        }
+
+        function atan() {
+            currentOperation = Math.atan(parseFloat(currentOperation)).toString();
+            updateDisplay();
+        }
+
+        function log() {
+            currentOperation = Math.log10(parseFloat(currentOperation)).toString();
+            updateDisplay();
+        }
+
+        function ln() {
+            currentOperation = Math.log(parseFloat(currentOperation)).toString();
+            updateDisplay();
+        }
+
+        function pi() {
+            currentOperation = Math.PI.toString();
+            updateDisplay();
+        }
+
+        function e() {
+            currentOperation = Math.E.toString();
+            updateDisplay();
+        }
+
+        // Update display
+        function updateDisplay() {
+            currentOperationScreen.textContent = currentOperation;
+            if (operation != null) {
+                previousOperationScreen.textContent = `${previousOperation} ${operation}`;
+            } else {
+                previousOperationScreen.textContent = '';
+            }
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            if (event.key >= '0' && event.key <= '9') {
+                appendNumber(event.key);
+            } else if (event.key === '.') {
+                appendDecimal();
+            } else if (event.key === '+' || event.key === '-' || event.key === '*' || event.key === '/') {
+                appendOperation(event.key);
+            } else if (event.key === 'Enter' || event.key === '=') {
+                calculate();
+            } else if (event.key === 'Escape') {
+                clearAll();
+            } else if (event.key === 'Backspace') {
+                backspace();
+            } else if (event.key === '%') {
+                percentage();
+            } else if (event.key === '^') {
+                power();
+            }
+        });
+    </script>
+</body>
+</html>
