@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Intake Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-blue-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 p-3 rounded-full">
+                        <i class="fas fa-tint text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Water Intake Calculator</h1>
+                        <p class="opacity-90">Calculate your daily water needs</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="waterForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="male" class="h-4 w-4 text-blue-600 focus:ring-blue-500" checked>
+                                <span class="ml-2">Male</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="female" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                <span class="ml-2">Female</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="weight" class="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
+                        <input type="number" id="weight" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 70">
+                    </div>
+
+                    <div>
+                        <label for="activity" class="block text-sm font-medium text-gray-700 mb-1">Activity Level</label>
+                        <select id="activity" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="30">Sedentary (little or no exercise)</option>
+                            <option value="35">Lightly active (light exercise 1-3 days/week)</option>
+                            <option value="40">Moderately active (moderate exercise 3-5 days/week)</option>
+                            <option value="45">Very active (hard exercise 6-7 days/week)</option>
+                            <option value="50">Extremely active (very hard exercise & physical job)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="climate" class="block text-sm font-medium text-gray-700 mb-1">Climate</label>
+                        <select id="climate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="1">Temperate</option>
+                            <option value="1.2">Hot/Humid</option>
+                            <option value="1.5">Very Hot/Dry</option>
+                        </select>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Daily Water Needs</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Base Water Intake:</span>
+                            <span id="baseWater" class="font-semibold">0 ml</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Activity Adjustment:</span>
+                            <span id="activityWater" class="font-semibold">+0 ml</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Climate Adjustment:</span>
+                            <span id="climateWater" class="font-semibold">+0 ml</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Total Daily Water:</span>
+                            <span id="totalWater" class="font-semibold">0 ml (~0 glasses)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('waterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            const climate = parseFloat(document.getElementById('climate').value);
+            
+            // Base water intake (ml per kg)
+            let baseIntake = weight * (gender === 'male' ? 35 : 31);
+            
+            // Activity adjustment
+            const activityAdjustment = weight * (activity - 30);
+            
+            // Climate adjustment
+            const climateAdjustment = baseIntake * (climate - 1);
+            
+            // Total water
+            const totalWater = Math.round(baseIntake + activityAdjustment + climateAdjustment);
+            const glasses = Math.round(totalWater / 250);
+            
+            document.getElementById('baseWater').textContent = Math.round(baseIntake) + ' ml';
+            document.getElementById('activityWater').textContent = '+' + Math.round(activityAdjustment) + ' ml';
+            document.getElementById('climateWater').textContent = '+' + Math.round(climateAdjustment) + ' ml';
+            document.getElementById('totalWater').textContent = totalWater + ' ml (~' + glasses + ' glasses)';
+            document.getElementById('results').classList.remove('hidden');
+        });
+        
+        document.getElementById('waterForm').addEventListener('reset', function() {
+            document.getElementById('results').classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
