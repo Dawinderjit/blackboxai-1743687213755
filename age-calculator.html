@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-blue-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 p-3 rounded-full">
+                        <i class="fas fa-birthday-cake text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Age Calculator</h1>
+                        <p class="opacity-90">Calculate your exact age in years, months and days</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="ageForm" class="space-y-6">
+                    <div>
+                        <label for="birthDate" class="block text-sm font-medium text-gray-700 mb-1">Birth Date</label>
+                        <input type="date" id="birthDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="currentDate" class="block text-sm font-medium text-gray-700 mb-1">Current Date (or select another date)</label>
+                        <input type="date" id="currentDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate Age
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Results</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Your Age:</span>
+                            <span id="ageResult" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">In Months:</span>
+                            <span id="monthsResult" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">In Days:</span>
+                            <span id="daysResult" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Next Birthday:</span>
+                            <span id="nextBirthday" class="font-semibold">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('ageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const birthDate = new Date(document.getElementById('birthDate').value);
+            const currentDate = new Date(document.getElementById('currentDate').value || new Date());
+            
+            if (isNaN(birthDate.getTime())) {
+                alert('Please enter a valid birth date');
+                return;
+            }
+            
+            if (birthDate > currentDate) {
+                alert('Birth date cannot be in the future');
+                return;
+            }
+            
+            // Calculate age
+            let years = currentDate.getFullYear() - birthDate.getFullYear();
+            let months = currentDate.getMonth() - birthDate.getMonth();
+            let days = currentDate.getDate() - birthDate.getDate();
+            
+            // Adjust for negative months/days
+            if (months < 0 || (months === 0 && days < 0)) {
+                years--;
+                months += 12;
+            }
+            if (days < 0) {
+                const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+                days = lastMonth.getDate() - birthDate.getDate() + currentDate.getDate();
+                months--;
+            }
+            
+            // Calculate total months and days
+            const totalMonths = years * 12 + months;
+            const timeDiff = currentDate - birthDate;
+            const totalDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            
+            // Calculate next birthday
+            const nextBirthday = new Date(currentDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            if (nextBirthday < currentDate) {
+                nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+            }
+            const daysUntilBirthday = Math.ceil((nextBirthday - currentDate) / (1000 * 60 * 60 * 24));
+            
+            // Update results
+            document.getElementById('ageResult').textContent = `${years} years, ${months} months, ${days} days`;
+            document.getElementById('monthsResult').textContent = totalMonths;
+            document.getElementById('daysResult').textContent = totalDays;
+            document.getElementById('nextBirthday').textContent = `${nextBirthday.toDateString()} (in ${daysUntilBirthday} days)`;
+            document.getElementById('results').classList.remove('hidden');
+        });
+        
+        document.getElementById('ageForm').addEventListener('reset', function() {
+            document.getElementById('results').classList.add('hidden');
+        });
+
+        // Set default current date to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('currentDate').value = today;
+        });
+    </script>
+</body>
+</html>
