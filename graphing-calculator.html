@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphing Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-blue-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 p-3 rounded-full">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Graphing Calculator</h1>
+                        <p class="opacity-90">Plot and analyze mathematical functions</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="graphForm" class="space-y-6">
+                    <div>
+                        <label for="functionInput" class="block text-sm font-medium text-gray-700 mb-1">Function (use 'x' as variable)</label>
+                        <input type="text" id="functionInput" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. Math.sin(x) or x^2 + 2*x + 1">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="xMin" class="block text-sm font-medium text-gray-700 mb-1">X Min</label>
+                            <input type="number" id="xMin" value="-10" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="xMax" class="block text-sm font-medium text-gray-700 mb-1">X Max</label>
+                            <input type="number" id="xMax" value="10" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="yMin" class="block text-sm font-medium text-gray-700 mb-1">Y Min</label>
+                            <input type="number" id="yMin" value="-10" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="yMax" class="block text-sm font-medium text-gray-700 mb-1">Y Max</label>
+                            <input type="number" id="yMax" value="10" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Plot Function
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Graph Canvas -->
+                <div class="p-6">
+                    <canvas id="graphCanvas" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize chart
+        const ctx = document.getElementById('graphCanvas').getContext('2d');
+        let chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Function',
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'center',
+                        title: {
+                            display: true,
+                            text: 'x-axis'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        position: 'center',
+                        title: {
+                            display: true,
+                            text: 'y-axis'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Evaluate function
+        function evaluateFunction(fnString, x) {
+            try {
+                // Replace ^ with ** for exponentiation
+                const processedFn = fnString.replace(/\^/g, '**');
+                // Create function with x as parameter
+                const fn = new Function('x', `return ${processedFn}`);
+                return fn(x);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Generate data points
+        function generateData(fnString, xMin, xMax, steps = 100) {
+            const data = [];
+            const stepSize = (xMax - xMin) / steps;
+            
+            for (let x = xMin; x <= xMax; x += stepSize) {
+                const y = evaluateFunction(fnString, x);
+                if (y !== null && !isNaN(y)) {
+                    data.push({x, y});
+                }
+            }
+            
+            return data;
+        }
+
+        document.getElementById('graphForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fnString = document.getElementById('functionInput').value;
+            const xMin = parseFloat(document.getElementById('xMin').value);
+            const xMax = parseFloat(document.getElementById('xMax').value);
+            const yMin = parseFloat(document.getElementById('yMin').value);
+            const yMax = parseFloat(document.getElementById('yMax').value);
+            
+            if (!fnString || isNaN(xMin) || isNaN(xMax) || isNaN(yMin) || isNaN(yMax)) {
+                alert('Please enter valid values');
+                return;
+            }
+            
+            // Generate data
+            const data = generateData(fnString, xMin, xMax);
+            
+            // Update chart
+            chart.data.datasets[0].data = data;
+            chart.data.datasets[0].label = `y = ${fnString}`;
+            chart.options.scales.x.min = xMin;
+            chart.options.scales.x.max = xMax;
+            chart.options.scales.y.min = yMin;
+            chart.options.scales.y.max = yMax;
+            chart.update();
+        });
+        
+        document.getElementById('graphForm').addEventListener('reset', function() {
+            document.getElementById('functionInput').value = '';
+            document.getElementById('xMin').value = -10;
+            document.getElementById('xMax').value = 10;
+            document.getElementById('yMin').value = -10;
+            document.getElementById('yMax').value = 10;
+            
+            // Clear chart
+            chart.data.datasets[0].data = [];
+            chart.update();
+        });
+    </script>
+</body>
+</html>
