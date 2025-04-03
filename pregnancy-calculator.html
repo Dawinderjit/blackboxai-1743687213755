@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregnancy Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-blue-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 p-3 rounded-full">
+                        <i class="fas fa-baby text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Pregnancy Calculator</h1>
+                        <p class="opacity-90">Estimate your due date and pregnancy milestones</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="pregnancyForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Calculation Method</label>
+                        <select id="method" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="lmp">Last Menstrual Period (LMP)</option>
+                            <option value="conception">Conception Date</option>
+                            <option value="ultrasound">Ultrasound Date</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        <input type="date" id="date" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div id="ultrasoundWeekField" class="hidden">
+                        <label for="ultrasoundWeek" class="block text-sm font-medium text-gray-700 mb-1">Ultrasound Week</label>
+                        <input type="number" id="ultrasoundWeek" min="1" max="42" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 12">
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Pregnancy Timeline</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Due Date:</span>
+                            <span id="dueDate" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Current Week:</span>
+                            <span id="currentWeek" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Trimester:</span>
+                            <span id="trimester" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Days Remaining:</span>
+                            <span id="daysRemaining" class="font-semibold">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Show/hide ultrasound week field
+        document.getElementById('method').addEventListener('change', function() {
+            document.getElementById('ultrasoundWeekField').classList.toggle('hidden', this.value !== 'ultrasound');
+        });
+
+        document.getElementById('pregnancyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const method = document.getElementById('method').value;
+            const date = new Date(document.getElementById('date').value);
+            const ultrasoundWeek = method === 'ultrasound' ? parseInt(document.getElementById('ultrasoundWeek').value) : 0;
+            
+            if (isNaN(date.getTime())) {
+                alert('Please enter a valid date');
+                return;
+            }
+
+            let dueDate;
+            if (method === 'lmp') {
+                // Naegele's rule: LMP + 280 days
+                dueDate = new Date(date);
+                dueDate.setDate(dueDate.getDate() + 280);
+            } else if (method === 'conception') {
+                // Conception date + 266 days
+                dueDate = new Date(date);
+                dueDate.setDate(dueDate.getDate() + 266);
+            } else {
+                // Ultrasound dating
+                const weeksToAdd = 40 - ultrasoundWeek;
+                dueDate = new Date(date);
+                dueDate.setDate(dueDate.getDate() + (weeksToAdd * 7));
+            }
+
+            // Calculate current week and trimester
+            const today = new Date();
+            const daysPassed = Math.floor((today - date) / (1000 * 60 * 60 * 24));
+            const currentWeek = Math.min(42, Math.floor(daysPassed / 7));
+            let trimester;
+            if (currentWeek < 13) trimester = "First";
+            else if (currentWeek < 27) trimester = "Second";
+            else trimester = "Third";
+
+            // Days remaining
+            const daysRemaining = Math.max(0, Math.floor((dueDate - today) / (1000 * 60 * 60 * 24)));
+
+            // Format results
+            document.getElementById('dueDate').textContent = dueDate.toLocaleDateString();
+            document.getElementById('currentWeek').textContent = currentWeek + (currentWeek === 1 ? " week" : " weeks");
+            document.getElementById('trimester').textContent = trimester + " Trimester";
+            document.getElementById('daysRemaining').textContent = daysRemaining + (daysRemaining === 1 ? " day" : " days");
+            document.getElementById('results').classList.remove('hidden');
+        });
+        
+        document.getElementById('pregnancyForm').addEventListener('reset', function() {
+            document.getElementById('results').classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
