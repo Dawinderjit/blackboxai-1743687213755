@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgage Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-blue-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 p-3 rounded-full">
+                        <i class="fas fa-home text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Mortgage Calculator</h1>
+                        <p class="opacity-90">Estimate your home loan payments including taxes and insurance</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="mortgageForm" class="space-y-6">
+                    <div>
+                        <label for="homeValue" class="block text-sm font-medium text-gray-700 mb-1">Home Value ($)</label>
+                        <input type="number" id="homeValue" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 300000">
+                        <p id="homeValueError" class="error-message hidden">Please enter a valid amount</p>
+                    </div>
+
+                    <div>
+                        <label for="downPayment" class="block text-sm font-medium text-gray-700 mb-1">Down Payment ($)</label>
+                        <input type="number" id="downPayment" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 60000">
+                        <p id="downPaymentError" class="error-message hidden">Please enter a valid amount</p>
+                    </div>
+
+                    <div>
+                        <label for="loanTerm" class="block text-sm font-medium text-gray-700 mb-1">Loan Term (years)</label>
+                        <select id="loanTerm" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="15">15 years</option>
+                            <option value="30" selected>30 years</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="interestRate" class="block text-sm font-medium text-gray-700 mb-1">Interest Rate (%)</label>
+                        <input type="number" step="0.01" id="interestRate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 4.5">
+                        <p id="interestRateError" class="error-message hidden">Please enter a valid interest rate</p>
+                    </div>
+
+                    <div>
+                        <label for="propertyTax" class="block text-sm font-medium text-gray-700 mb-1">Annual Property Tax ($)</label>
+                        <input type="number" id="propertyTax" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 3000">
+                        <p id="propertyTaxError" class="error-message hidden">Please enter a valid amount</p>
+                    </div>
+
+                    <div>
+                        <label for="homeInsurance" class="block text-sm font-medium text-gray-700 mb-1">Annual Home Insurance ($)</label>
+                        <input type="number" id="homeInsurance" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 1200">
+                        <p id="homeInsuranceError" class="error-message hidden">Please enter a valid amount</p>
+                    </div>
+
+                    <div>
+                        <label for="pmi" class="block text-sm font-medium text-gray-700 mb-1">PMI (%)</label>
+                        <input type="number" step="0.01" id="pmi" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 0.5" value="0.5">
+                        <p class="text-xs text-gray-500 mt-1">Private Mortgage Insurance (if down payment < 20%)</p>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Mortgage Summary</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Loan Amount:</span>
+                            <span id="loanAmount" class="font-semibold">$0.00</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Down Payment (%):</span>
+                            <span id="downPaymentPercent" class="font-semibold">0%</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Principal & Interest:</span>
+                            <span id="principalInterest" class="font-semibold">$0.00</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Property Tax:</span>
+                            <span id="monthlyTax" class="font-semibold">$0.00</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Home Insurance:</span>
+                            <span id="monthlyInsurance" class="font-semibold">$0.00</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">PMI:</span>
+                            <span id="monthlyPmi" class="font-semibold">$0.00</span>
+                        </div>
+                        <div class="flex justify-between border-b-2 border-blue-200 pb-2">
+                            <span class="text-gray-600 font-bold">Total Monthly Payment:</span>
+                            <span id="totalPayment" class="font-bold text-blue-600">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Breakdown Chart -->
+                    <div class="mt-8">
+                        <h3 class="text-lg font-medium mb-3">Payment Breakdown</h3>
+                        <div class="h-6 bg-gray-200 rounded-full overflow-hidden">
+                            <div id="principalChart" class="h-full bg-blue-500" style="width: 0%"></div>
+                            <div id="interestChart" class="h-full bg-blue-400" style="width: 0%"></div>
+                            <div id="taxChart" class="h-full bg-green-500" style="width: 0%"></div>
+                            <div id="insuranceChart" class="h-full bg-yellow-500" style="width: 0%"></div>
+                            <div id="pmiChart" class="h-full bg-red-500" style="width: 0%"></div>
+                        </div>
+                        <div class="flex flex-wrap gap-4 mt-4">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-blue-500 mr-2"></div>
+                                <span class="text-sm">Principal</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-blue-400 mr-2"></div>
+                                <span class="text-sm">Interest</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-green-500 mr-2"></div>
+                                <span class="text-sm">Tax</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-yellow-500 mr-2"></div>
+                                <span class="text-sm">Insurance</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-red-500 mr-2"></div>
+                                <span class="text-sm">PMI</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('mortgageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get input values
+            const homeValue = parseFloat(document.getElementById('homeValue').value);
+            const downPayment = parseFloat(document.getElementById('downPayment').value);
+            const loanTerm = parseInt(document.getElementById('loanTerm').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value) / 100 / 12;
+            const propertyTax = parseFloat(document.getElementById('propertyTax').value) / 12;
+            const homeInsurance = parseFloat(document.getElementById('homeInsurance').value) / 12;
+            const pmiRate = parseFloat(document.getElementById('pmi').value) / 100;
+            
+            // Validate inputs
+            let isValid = true;
+            
+            if (isNaN(homeValue) || homeValue <= 0) {
+                document.getElementById('homeValue').classList.add('input-error');
+                document.getElementById('homeValueError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('homeValue').classList.remove('input-error');
+                document.getElementById('homeValueError').classList.add('hidden');
+            }
+            
+            if (isNaN(downPayment) || downPayment < 0 || downPayment > homeValue) {
+                document.getElementById('downPayment').classList.add('input-error');
+                document.getElementById('downPaymentError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('downPayment').classList.remove('input-error');
+                document.getElementById('downPaymentError').classList.add('hidden');
+            }
+            
+            if (isNaN(interestRate) || interestRate <= 0) {
+                document.getElementById('interestRate').classList.add('input-error');
+                document.getElementById('interestRateError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('interestRate').classList.remove('input-error');
+                document.getElementById('interestRateError').classList.add('hidden');
+            }
+            
+            if (isNaN(propertyTax) || propertyTax < 0) {
+                document.getElementById('propertyTax').classList.add('input-error');
+                document.getElementById('propertyTaxError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('propertyTax').classList.remove('input-error');
+                document.getElementById('propertyTaxError').classList.add('hidden');
+            }
+            
+            if (isNaN(homeInsurance) || homeInsurance < 0) {
+                document.getElementById('homeInsurance').classList.add('input-error');
+                document.getElementById('homeInsuranceError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('homeInsurance').classList.remove('input-error');
+                document.getElementById('homeInsuranceError').classList.add('hidden');
+            }
+            
+            if (!isValid) return;
+            
+            // Calculate loan amount
+            const loanAmount = homeValue - downPayment;
+            const termInMonths = loanTerm * 12;
+            
+            // Calculate PMI (only if down payment < 20%)
+            let pmi = 0;
+            if (downPayment < homeValue * 0.2) {
+                pmi = loanAmount * pmiRate / 12;
+            }
+            
+            // Calculate principal and interest payment
+            const monthlyPayment = (loanAmount * interestRate * Math.pow(1 + interestRate, termInMonths)) / 
+                                 (Math.pow(1 + interestRate, termInMonths) - 1);
+            
+            // Calculate total monthly payment
+            const totalMonthlyPayment = monthlyPayment + propertyTax + homeInsurance + pmi;
+            
+            // Calculate interest portion of payment
+            const firstMonthInterest = loanAmount * interestRate;
+            const firstMonthPrincipal = monthlyPayment - firstMonthInterest;
+            
+            // Display results
+            document.getElementById('loanAmount').textContent = '$' + loanAmount.toLocaleString('en-US', {maximumFractionDigits: 2});
+            document.getElementById('downPaymentPercent').textContent = (downPayment / homeValue * 100).toFixed(1) + '%';
+            document.getElementById('principalInterest').textContent = '$' + monthlyPayment.toFixed(2);
+            document.getElementById('monthlyTax').textContent = '$' + propertyTax.toFixed(2);
+            document.getElementById('monthlyInsurance').textContent = '$' + homeInsurance.toFixed(2);
+            document.getElementById('monthlyPmi').textContent = '$' + pmi.toFixed(2);
+            document.getElementById('totalPayment').textContent = '$' + totalMonthlyPayment.toFixed(2);
+            
+            // Update payment breakdown chart
+            updatePaymentChart(monthlyPayment, firstMonthPrincipal, firstMonthInterest, 
+                             propertyTax, homeInsurance, pmi, totalMonthlyPayment);
+            
+            // Show results section
+            document.getElementById('results').classList.remove('hidden');
+        });
+        
+        function updatePaymentChart(monthlyPayment, principal, interest, tax, insurance, pmi, total) {
+            const principalPercent = (principal / total) * 100;
+            const interestPercent = (interest / total) * 100;
+            const taxPercent = (tax / total) * 100;
+            const insurancePercent = (insurance / total) * 100;
+            const pmiPercent = (pmi / total) * 100;
+            
+            document.getElementById('principalChart').style.width = principalPercent + '%';
+            document.getElementById('interestChart').style.width = interestPercent + '%';
+            document.getElementById('taxChart').style.width = taxPercent + '%';
+            document.getElementById('insuranceChart').style.width = insurancePercent + '%';
+            document.getElementById('pmiChart').style.width = pmiPercent + '%';
+        }
+        
+        // Reset form
+        document.getElementById('mortgageForm').addEventListener('reset', function() {
+            document.getElementById('results').classList.add('hidden');
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+        });
+    </script>
+</body>
+</html>
