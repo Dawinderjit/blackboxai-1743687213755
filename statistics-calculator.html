@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-blue-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 p-3 rounded-full">
+                        <i class="fas fa-chart-bar text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Statistics Calculator</h1>
+                        <p class="opacity-90">Calculate statistical measures from your data</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="statsForm" class="space-y-6">
+                    <div>
+                        <label for="dataInput" class="block text-sm font-medium text-gray-700 mb-1">Enter your data (comma separated)</label>
+                        <textarea id="dataInput" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 5, 10, 15, 20, 25"></textarea>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Statistical Results</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Count:</span>
+                            <span id="count" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Sum:</span>
+                            <span id="sum" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Mean:</span>
+                            <span id="mean" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Median:</span>
+                            <span id="median" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Mode:</span>
+                            <span id="mode" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Standard Deviation:</span>
+                            <span id="stdDev" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Variance:</span>
+                            <span id="variance" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Min:</span>
+                            <span id="min" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Max:</span>
+                            <span id="max" class="font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Range:</span>
+                            <span id="range" class="font-semibold">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Parse input data
+        function parseData(input) {
+            return input.split(',')
+                .map(item => parseFloat(item.trim()))
+                .filter(item => !isNaN(item));
+        }
+
+        // Calculate statistics
+        function calculateStats(data) {
+            if (data.length === 0) return null;
+            
+            // Basic calculations
+            const count = data.length;
+            const sum = data.reduce((a, b) => a + b, 0);
+            const mean = sum / count;
+            const sorted = [...data].sort((a, b) => a - b);
+            const min = sorted[0];
+            const max = sorted[sorted.length - 1];
+            const range = max - min;
+            
+            // Median
+            const mid = Math.floor(count / 2);
+            const median = count % 2 !== 0 ? 
+                sorted[mid] : 
+                (sorted[mid - 1] + sorted[mid]) / 2;
+            
+            // Mode
+            const frequency = {};
+            let maxFreq = 0;
+            let modes = [];
+            
+            data.forEach(num => {
+                frequency[num] = (frequency[num] || 0) + 1;
+                if (frequency[num] > maxFreq) {
+                    maxFreq = frequency[num];
+                    modes = [num];
+                } else if (frequency[num] === maxFreq) {
+                    modes.push(num);
+                }
+            });
+            
+            const mode = modes.length === count ? 'No mode' : 
+                         modes.length > 1 ? modes.join(', ') : modes[0];
+            
+            // Variance and Standard Deviation
+            const squaredDiffs = data.map(num => Math.pow(num - mean, 2));
+            const variance = squaredDiffs.reduce((a, b) => a + b, 0) / count;
+            const stdDev = Math.sqrt(variance);
+            
+            return {
+                count,
+                sum,
+                mean,
+                median,
+                mode,
+                stdDev,
+                variance,
+                min,
+                max,
+                range
+            };
+        }
+
+        document.getElementById('statsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const input = document.getElementById('dataInput').value;
+            const data = parseData(input);
+            
+            if (data.length === 0) {
+                alert('Please enter valid numerical data');
+                return;
+            }
+            
+            const stats = calculateStats(data);
+            
+            // Update results
+            document.getElementById('count').textContent = stats.count;
+            document.getElementById('sum').textContent = stats.sum.toFixed(2);
+            document.getElementById('mean').textContent = stats.mean.toFixed(2);
+            document.getElementById('median').textContent = stats.median.toFixed(2);
+            document.getElementById('mode').textContent = stats.mode;
+            document.getElementById('stdDev').textContent = stats.stdDev.toFixed(2);
+            document.getElementById('variance').textContent = stats.variance.toFixed(2);
+            document.getElementById('min').textContent = stats.min;
+            document.getElementById('max').textContent = stats.max;
+            document.getElementById('range').textContent = stats.range;
+            
+            document.getElementById('results').classList.remove('hidden');
+        });
+        
+        document.getElementById('statsForm').addEventListener('reset', function() {
+            document.getElementById('results').classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
