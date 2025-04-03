@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .growth-badge {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-blue-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 p-3 rounded-full">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Investment Calculator</h1>
+                        <p class="opacity-90">Project your investment growth with compound interest</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="investmentForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="principal" class="block text-sm font-medium text-gray-700 mb-1">Initial Investment ($)</label>
+                            <input type="number" id="principal" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 10000">
+                            <p id="principalError" class="error-message hidden">Please enter a valid amount</p>
+                        </div>
+                        <div>
+                            <label for="monthly" class="block text-sm font-medium text-gray-700 mb-1">Monthly Contribution ($)</label>
+                            <input type="number" id="monthly" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 500" value="0">
+                            <p id="monthlyError" class="error-message hidden">Please enter a valid amount</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="years" class="block text-sm font-medium text-gray-700 mb-1">Investment Period (years)</label>
+                            <input type="number" id="years" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 10">
+                            <p id="yearsError" class="error-message hidden">Please enter a valid period</p>
+                        </div>
+                        <div>
+                            <label for="rate" class="block text-sm font-medium text-gray-700 mb-1">Annual Return Rate (%)</label>
+                            <input type="number" step="0.01" id="rate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 7">
+                            <p id="rateError" class="error-message hidden">Please enter a valid rate</p>
+                        </div>
+                        <div>
+                            <label for="compound" class="block text-sm font-medium text-gray-700 mb-1">Compounding Frequency</label>
+                            <select id="compound" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="1">Annually</option>
+                                <option value="2">Semi-annually</option>
+                                <option value="4">Quarterly</option>
+                                <option value="12" selected>Monthly</option>
+                                <option value="365">Daily</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate Growth
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <!-- Total Invested -->
+                        <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                            <p class="text-sm text-blue-600 mb-1">Total Invested</p>
+                            <p id="totalInvested" class="text-2xl font-bold text-blue-700">$0</p>
+                        </div>
+                        <!-- Interest Earned -->
+                        <div class="bg-green-50 border border-green-100 rounded-lg p-4">
+                            <p class="text-sm text-green-600 mb-1">Interest Earned</p>
+                            <p id="interestEarned" class="text-2xl font-bold text-green-700">$0</p>
+                        </div>
+                        <!-- Future Value -->
+                        <div class="bg-purple-50 border border-purple-100 rounded-lg p-4">
+                            <p class="text-sm text-purple-600 mb-1">Future Value</p>
+                            <p id="futureValue" class="text-2xl font-bold text-purple-700">$0</p>
+                        </div>
+                    </div>
+
+                    <!-- Growth Chart -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-medium mb-3">Investment Growth Over Time</h3>
+                        <div class="bg-white border rounded-lg p-4">
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Yearly Breakdown -->
+                    <div>
+                        <h3 class="text-lg font-medium mb-3">Yearly Breakdown</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Invested</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Interest</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="breakdownBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('investmentForm');
+            const results = document.getElementById('results');
+            let growthChart = null;
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateInvestment();
+            });
+
+            form.addEventListener('reset', function() {
+                results.classList.add('hidden');
+                if (growthChart) {
+                    growthChart.destroy();
+                }
+                document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+                document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+            });
+
+            function calculateInvestment() {
+                // Get input values
+                const principal = parseFloat(document.getElementById('principal').value);
+                const monthly = parseFloat(document.getElementById('monthly').value);
+                const years = parseFloat(document.getElementById('years').value);
+                const rate = parseFloat(document.getElementById('rate').value) / 100;
+                const compoundFreq = parseInt(document.getElementById('compound').value);
+
+                // Validate inputs
+                let isValid = true;
+
+                if (isNaN(principal) || principal <= 0) {
+                    document.getElementById('principal').classList.add('input-error');
+                    document.getElementById('principalError').classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById('principal').classList.remove('input-error');
+                    document.getElementById('principalError').classList.add('hidden');
+                }
+
+                if (isNaN(monthly) || monthly < 0) {
+                    document.getElementById('monthly').classList.add('input-error');
+                    document.getElementById('monthlyError').classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById('monthly').classList.remove('input-error');
+                    document.getElementById('monthlyError').classList.add('hidden');
+                }
+
+                if (isNaN(years) || years <= 0) {
+                    document.getElementById('years').classList.add('input-error');
+                    document.getElementById('yearsError').classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById('years').classList.remove('input-error');
+                    document.getElementById('yearsError').classList.add('hidden');
+                }
+
+                if (isNaN(rate) || rate <= 0) {
+                    document.getElementById('rate').classList.add('input-error');
+                    document.getElementById('rateError').classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById('rate').classList.remove('input-error');
+                    document.getElementById('rateError').classList.add('hidden');
+                }
+
+                if (!isValid) return;
+
+                // Calculate investment growth
+                const periods = years * compoundFreq;
+                const periodicRate = rate / compoundFreq;
+                let balance = principal;
+                const yearlyData = [];
+                const chartLabels = [];
+                const chartData = [];
+
+                let totalInvested = principal;
+                let totalInterest = 0;
+
+                for (let year = 1; year <= years; year++) {
+                    let yearlyInterest = 0;
+                    const startBalance = balance;
+
+                    for (let period = 1; period <= compoundFreq; period++) {
+                        const periodInterest = balance * periodicRate;
+                        yearlyInterest += periodInterest;
+                        balance += periodInterest;
+                        if (monthly > 0) {
+                            for (let month = 1; month <= 12/compoundFreq; month++) {
+                                balance += monthly;
+                                totalInvested += monthly;
+                            }
+                        }
+                    }
+
+                    totalInterest += yearlyInterest;
+                    yearlyData.push({
+                        year: year,
+                        invested: totalInvested,
+                        interest: totalInterest,
+                        balance: balance
+                    });
+
+                    chartLabels.push(`Year ${year}`);
+                    chartData.push(balance);
+                }
+
+                // Update results
+                document.getElementById('totalInvested').textContent = formatCurrency(totalInvested);
+                document.getElementById('interestEarned').textContent = formatCurrency(totalInterest);
+                document.getElementById('futureValue').textContent = formatCurrency(balance);
+
+                // Update yearly breakdown
+                const breakdownBody = document.getElementById('breakdownBody');
+                breakdownBody.innerHTML = '';
+                yearlyData.forEach(data => {
+                    const row = document.createElement('tr');
+                    row.className = year % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                    row.innerHTML = `
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${data.year}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${formatCurrency(data.invested)}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${formatCurrency(data.interest)}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${formatCurrency(data.balance)}</td>
+                    `;
+                    breakdownBody.appendChild(row);
+                });
+
+                // Update chart
+                if (growthChart) {
+                    growthChart.destroy();
+                }
+
+                const ctx = document.getElementById('growthChart').getContext('2d');
+                growthChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Investment Value',
+                            data: chartData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 2,
+                            tension: 0.1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Value: ' + formatCurrency(context.raw);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Show results
+                results.classList.remove('hidden');
+            }
+
+            function formatCurrency(value) {
+                return '$' + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
+        });
+    </script>
+</body>
+</html>
