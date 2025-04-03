@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Age Calculator | Calculator Hub</title>
+    <title>Age Calculator | Calculate Your Exact Age | Calculator Hub</title>
+    <meta name="description" content="Free online age calculator tool. Calculate your exact age in years, months and days. Perfect for birthday planning and age verification.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -16,11 +17,13 @@
             margin-top: 0.25rem;
         }
     </style>
+    <!-- Google Adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXX"></script>
 </head>
 <body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-blue-600 text-white p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
+    <!-- Common Header -->
+    <header class="bg-blue-600 text-white shadow-md">
+        <nav class="container mx-auto p-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <a href="index.html" class="flex items-center space-x-2">
                     <i class="fas fa-arrow-left"></i>
@@ -28,11 +31,40 @@
                     <h1 class="text-xl font-bold">Calculator Hub</h1>
                 </a>
             </div>
-        </div>
-    </nav>
+            <div class="hidden md:block">
+                <input type="text" placeholder="Search calculators..." class="px-4 py-2 rounded-lg text-gray-800">
+            </div>
+        </nav>
+    </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8 max-w-2xl">
+    <!-- Main Content with Sidebar -->
+    <main class="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+        <!-- Sidebar for SEO/Ads -->
+        <aside class="w-full md:w-1/4 space-y-6">
+            <!-- SEO Content -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-lg font-bold mb-4">About Age Calculator</h2>
+                <p class="text-gray-600 mb-4">Our free age calculator helps you determine your exact age in years, months and days. Perfect for:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                    <li>Birthday planning</li>
+                    <li>Age verification</li>
+                    <li>School applications</li>
+                    <li>Retirement planning</li>
+                </ul>
+            </div>
+            
+            <!-- Ad Space -->
+            <div class="bg-white p-4 rounded-xl shadow-md text-center">
+                <p class="text-sm text-gray-500 mb-2">Advertisement</p>
+                <div class="border border-gray-200 p-4">
+                    <!-- Ad content will be loaded here -->
+                    <p class="text-gray-400">Google Ad Space</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Calculator Content -->
+        <div class="w-full md:w-2/4">
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <!-- Calculator Header -->
             <div class="bg-blue-600 text-white p-6">
@@ -93,7 +125,58 @@
                 </div>
             </div>
         </div>
+        </div>
+
+        <!-- Related Calculators Sidebar -->
+        <aside class="w-full md:w-1/4">
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-lg font-bold mb-4">Related Calculators</h2>
+                <div class="space-y-4">
+                    <a href="date-calculator.html" class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div class="bg-blue-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-calendar-alt text-blue-600"></i>
+                        </div>
+                        <span>Date Calculator</span>
+                    </a>
+                    <a href="pregnancy-calculator.html" class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div class="bg-pink-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-baby text-pink-600"></i>
+                        </div>
+                        <span>Pregnancy Calculator</span>
+                    </a>
+                    <a href="retirement-calculator.html" class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div class="bg-green-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-piggy-bank text-green-600"></i>
+                        </div>
+                        <span>Retirement Calculator</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
     </main>
+
+    <!-- Common Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-xl font-bold mb-2">Calculator Hub</h2>
+                    <p class="text-gray-400">28 essential calculators for all your needs</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-github text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400">
+                <p>&copy; 2023 Calculator Hub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
         document.getElementById('ageForm').addEventListener('submit', function(e) {
