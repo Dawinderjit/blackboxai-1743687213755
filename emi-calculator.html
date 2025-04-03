@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .payment-card {
+            transition: all 0.3s ease;
+        }
+        .payment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-purple-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-purple-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-purple-500 p-3 rounded-full">
+                        <i class="fas fa-money-bill-wave text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">EMI Calculator</h1>
+                        <p class="opacity-90">Calculate your Equated Monthly Installment and payment schedule</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="emiForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="loanAmount" class="block text-sm font-medium text-gray-700 mb-1">Loan Amount ($)</label>
+                            <input type="number" id="loanAmount" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="e.g. 25000">
+                            <p id="amountError" class="error-message hidden">Please enter a valid amount</p>
+                        </div>
+                        <div>
+                            <label for="interestRate" class="block text-sm font-medium text-gray-700 mb-1">Interest Rate (%)</label>
+                            <input type="number" step="0.01" id="interestRate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="e.g. 7.5">
+                            <p id="rateError" class="error-message hidden">Please enter a valid rate</p>
+                        </div>
+                        <div>
+                            <label for="loanTerm" class="block text-sm font-medium text-gray-700 mb-1">Loan Term (years)</label>
+                            <input type="number" id="loanTerm" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="e.g. 5">
+                            <p id="termError" class="error-message hidden">Please enter a valid term</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <input type="date" id="startDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label for="paymentFrequency" class="block text-sm font-medium text-gray-700 mb-1">Payment Frequency</label>
+                            <select id="paymentFrequency" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                                <option value="12">Monthly</option>
+                                <option value="4">Quarterly</option>
+                                <option value="2">Semi-annually</option>
+                                <option value="1">Annually</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate EMI
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Payment Summary</h2>
+                    
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <!-- EMI Amount -->
+                        <div class="payment-card bg-white border border-purple-100 rounded-lg p-4 shadow-sm">
+                            <div class="flex items-center">
+                                <div class="bg-purple-100 p-2 rounded-full mr-3">
+                                    <i class="fas fa-calendar-alt text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-purple-600 mb-1">EMI Amount</p>
+                                    <p id="emiAmount" class="text-2xl font-bold">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Total Interest -->
+                        <div class="payment-card bg-white border border-red-100 rounded-lg p-4 shadow-sm">
+                            <div class="flex items-center">
+                                <div class="bg-red-100 p-2 rounded-full mr-3">
+                                    <i class="fas fa-percentage text-red-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-red-600 mb-1">Total Interest</p>
+                                    <p id="totalInterest" class="text-2xl font-bold">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Total Payment -->
+                        <div class="payment-card bg-white border border-green-100 rounded-lg p-4 shadow-sm">
+                            <div class="flex items-center">
+                                <div class="bg-green-100 p-2 rounded-full mr-3">
+                                    <i class="fas fa-dollar-sign text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-green-600 mb-1">Total Payment</p>
+                                    <p id="totalPayment" class="text-2xl font-bold">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Breakdown Chart -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-medium mb-3">Payment Composition</h3>
+                        <div class="bg-white border rounded-lg p-4">
+                            <canvas id="paymentChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Amortization Schedule -->
+                    <div>
+                        <h3 class="text-lg font-medium mb-3">Amortization Schedule</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Payment #</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Principal</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Interest</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scheduleBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('emiForm');
+            const results = document.getElementById('results');
+            let paymentChart = null;
+
+            // Set default date to today
+            document.getElementById('startDate').valueAsDate = new Date();
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateEMI();
+            });
+
+            form.addEventListener('reset', function() {
+                results.classList.add('hidden');
+                if (paymentChart) {
+                    paymentChart.destroy();
+                }
+                document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+                document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+                document.getElementById('startDate').valueAsDate = new Date();
+            });
+
+            function calculateEMI() {
+                // Get input values
+                const amount = parseFloat(document.getElementById('loanAmount').value);
+                const rate = parseFloat(document.getElementById('interestRate').value);
+                const term = parseFloat(document.getElementById('loanTerm').value);
+                const frequency = parseInt(document.getElementById('paymentFrequency').value);
+                const startDate = new Date(document.getElementById('startDate').value);
+
+                // Validate inputs
+                let isValid = true;
+
+                if (isNaN(amount) || amount <= 0) {
+                    document.getElementById('loanAmount').classList.add('input-error');
+                    document.getElementById('amountError').classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById('loanAmount').classList.remove('input-error');
+                    document.getElementById('amountError').classList.add('hidden');
+                }
+
+                if (isNaN(rate) || rate <= 0) {
+                    document.getElementById('interestRate').classList.add('input-error');
+                    document.getElementById('rateError').classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById('interestRate').classList.remove('input-error');
+                    document.getElementById('rateError').classList.add('hidden');
+                }
+
+                if (isNaN(term) || term <= 0) {
+                    document.getElementById('loanTerm').classList.add('input-error');
+                    document.getElementById('termError').classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById('loanTerm').classList.remove('input-error');
+                    document.getElementById('termError').classList.add('hidden');
+                }
+
+                if (!isValid) return;
+
+                // Calculate EMI
+                const monthlyRate = (rate / 100) / frequency;
+                const periods = term * frequency;
+                const emi = amount * monthlyRate * Math.pow(1 + monthlyRate, periods) / (Math.pow(1 + monthlyRate, periods) - 1);
+                const totalPayment = emi * periods;
+                const totalInterest = totalPayment - amount;
+
+                // Update summary
+                document.getElementById('emiAmount').textContent = formatCurrency(emi);
+                document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+                document.getElementById('totalPayment').textContent = formatCurrency(totalPayment);
+
+                // Update payment chart
+                if (paymentChart) {
+                    paymentChart.destroy();
+                }
+
+                const ctx = document.getElementById('paymentChart').getContext('2d');
+                paymentChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Principal', 'Interest'],
+                        datasets: [{
+                            data: [amount, totalInterest],
+                            backgroundColor: ['#8b5cf6', '#ec4899'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + formatCurrency(context.raw);
+                                    }
+                                }
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+
+                // Generate amortization schedule
+                generateSchedule(amount, monthlyRate, periods, emi, startDate, frequency);
+
+                // Show results
+                results.classList.remove('hidden');
+            }
+
+            function generateSchedule(amount, monthlyRate, periods, emi, startDate, frequency) {
+                let balance = amount;
+                const scheduleBody = document.getElementById('scheduleBody');
+                scheduleBody.innerHTML = '';
+
+                // Calculate months between payments based on frequency
+                const monthsPerPayment = 12 / frequency;
+                const paymentDates = [];
+                let currentDate = new Date(startDate);
+
+                for (let i = 1; i <= periods; i++) {
+                    // Calculate payment date
+                    currentDate.setMonth(currentDate.getMonth() + monthsPerPayment);
+                    paymentDates.push(new Date(currentDate));
+
+                    const interest = balance * monthlyRate;
+                    const principal = emi - interest;
+                    balance -= principal;
+
+                    // Create table row
+                    const row = document.createElement('tr');
+                    row.className = i % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                    row.innerHTML = `
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${i}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${formatDate(currentDate)}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${formatCurrency(emi)}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${formatCurrency(principal)}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${formatCurrency(interest)}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${formatCurrency(Math.max(0, balance))}</td>
+                    `;
+                    scheduleBody.appendChild(row);
+                }
+            }
+
+            function formatCurrency(value) {
+                return '$' + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
+
+            function formatDate(date) {
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+        });
+    </script>
+</body>
+</html>
