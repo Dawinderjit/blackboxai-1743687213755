@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-blue-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 p-3 rounded-full">
+                        <i class="fas fa-calendar-alt text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Date Calculator</h1>
+                        <p class="opacity-90">Calculate date differences and add/subtract days</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="dateForm" class="space-y-6">
+                    <div>
+                        <label for="calculationType" class="block text-sm font-medium text-gray-700 mb-1">Calculation Type</label>
+                        <select id="calculationType" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="difference">Date Difference</option>
+                            <option value="addSubtract">Add/Subtract Days</option>
+                        </select>
+                    </div>
+
+                    <div id="dateDifferenceInputs">
+                        <div>
+                            <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <input type="date" id="startDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="mt-4">
+                            <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <input type="date" id="endDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div id="addSubtractInputs" class="hidden">
+                        <div>
+                            <label for="baseDate" class="block text-sm font-medium text-gray-700 mb-1">Base Date</label>
+                            <input type="date" id="baseDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="mt-4">
+                            <label for="daysToAdd" class="block text-sm font-medium text-gray-700 mb-1">Days to Add/Subtract</label>
+                            <input type="number" id="daysToAdd" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Use negative for subtraction">
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Results</h2>
+                    <div class="space-y-4">
+                        <div id="differenceResult" class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Days Between:</span>
+                            <span id="daysDifference" class="font-semibold">-</span>
+                        </div>
+                        <div id="newDateResult" class="flex justify-between border-b pb-2 hidden">
+                            <span class="text-gray-600">New Date:</span>
+                            <span id="calculatedDate" class="font-semibold">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Show/hide inputs based on calculation type
+        document.getElementById('calculationType').addEventListener('change', function() {
+            const type = this.value;
+            document.getElementById('dateDifferenceInputs').classList.toggle('hidden', type !== 'difference');
+            document.getElementById('addSubtractInputs').classList.toggle('hidden', type !== 'addSubtract');
+            document.getElementById('differenceResult').classList.toggle('hidden', type !== 'difference');
+            document.getElementById('newDateResult').classList.toggle('hidden', type !== 'addSubtract');
+        });
+
+        // Calculate date differences
+        document.getElementById('dateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('calculationType').value;
+            
+            try {
+                if (type === 'difference') {
+                    const startDate = new Date(document.getElementById('startDate').value);
+                    const endDate = new Date(document.getElementById('endDate').value);
+                    
+                    if (isNaN(startDate) || isNaN(endDate)) {
+                        throw new Error('Please select valid dates');
+                    }
+                    
+                    const timeDiff = endDate - startDate;
+                    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                    
+                    document.getElementById('daysDifference').textContent = daysDiff;
+                    document.getElementById('results').classList.remove('hidden');
+                } 
+                else if (type === 'addSubtract') {
+                    const baseDate = new Date(document.getElementById('baseDate').value);
+                    const daysToAdd = parseInt(document.getElementById('daysToAdd').value);
+                    
+                    if (isNaN(baseDate) || isNaN(daysToAdd)) {
+                        throw new Error('Please enter valid values');
+                    }
+                    
+                    const resultDate = new Date(baseDate);
+                    resultDate.setDate(resultDate.getDate() + daysToAdd);
+                    
+                    document.getElementById('calculatedDate').textContent = resultDate.toDateString();
+                    document.getElementById('results').classList.remove('hidden');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+        
+        document.getElementById('dateForm').addEventListener('reset', function() {
+            document.getElementById('results').classList.add('hidden');
+        });
+
+        // Set default dates to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+            document.getElementById('endDate').value = today;
+            document.getElementById('baseDate').value = today;
+        });
+    </script>
+</body>
+</html>
