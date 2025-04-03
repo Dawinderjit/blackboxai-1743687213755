@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discount Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .savings-badge {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-yellow-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-yellow-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-yellow-500 p-3 rounded-full">
+                        <i class="fas fa-tags text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Discount Calculator</h1>
+                        <p class="opacity-90">Calculate final price after discount and savings amount</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="discountForm" class="space-y-6">
+                    <div>
+                        <label for="originalPrice" class="block text-sm font-medium text-gray-700 mb-1">Original Price ($)</label>
+                        <input type="number" id="originalPrice" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500" placeholder="e.g. 100">
+                        <p id="priceError" class="error-message hidden">Please enter a valid price</p>
+                    </div>
+
+                    <div>
+                        <label for="discountPercent" class="block text-sm font-medium text-gray-700 mb-1">Discount Percentage (%)</label>
+                        <input type="number" id="discountPercent" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500" placeholder="e.g. 20">
+                        <p id="discountError" class="error-message hidden">Please enter a valid discount (0-100)</p>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Discount Summary</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <span class="text-gray-600">Original Price:</span>
+                            <span id="originalPriceDisplay" class="font-semibold">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <span class="text-gray-600">Discount Amount:</span>
+                            <span id="discountAmount" class="font-semibold text-red-500">-$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b-2 border-yellow-200 pb-2">
+                            <span class="text-gray-600 font-bold">Final Price:</span>
+                            <span id="finalPrice" class="font-bold text-green-600">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Savings Badge -->
+                    <div id="savingsBadge" class="mt-6 bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center savings-badge">
+                        <svg class="h-5 w-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>You save <span id="savingsPercent" class="font-bold">0%</span> (<span id="savingsAmount" class="font-bold">$0.00</span>)</span>
+                    </div>
+
+                    <!-- Price Comparison -->
+                    <div class="mt-6">
+                        <h3 class="text-lg font-medium mb-3">Price Comparison</h3>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-gray-600">Original</span>
+                            <span class="text-sm text-gray-600">Discounted</span>
+                        </div>
+                        <div class="flex">
+                            <div class="h-8 bg-gray-300 rounded-l-lg" id="originalBar" style="width: 100%"></div>
+                            <div class="h-8 bg-green-500 rounded-r-lg" id="discountedBar" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between mt-1">
+                            <span class="text-xs text-gray-500">100%</span>
+                            <span id="discountedPercent" class="text-xs text-gray-500">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('discountForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get input values
+            const originalPrice = parseFloat(document.getElementById('originalPrice').value);
+            const discountPercent = parseFloat(document.getElementById('discountPercent').value);
+            
+            // Validate inputs
+            let isValid = true;
+            
+            if (isNaN(originalPrice) || originalPrice <= 0) {
+                document.getElementById('originalPrice').classList.add('input-error');
+                document.getElementById('priceError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('originalPrice').classList.remove('input-error');
+                document.getElementById('priceError').classList.add('hidden');
+            }
+            
+            if (isNaN(discountPercent) || discountPercent < 0 || discountPercent > 100) {
+                document.getElementById('discountPercent').classList.add('input-error');
+                document.getElementById('discountError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('discountPercent').classList.remove('input-error');
+                document.getElementById('discountError').classList.add('hidden');
+            }
+            
+            if (!isValid) return;
+            
+            // Calculate discount
+            const discountAmount = originalPrice * (discountPercent / 100);
+            const finalPrice = originalPrice - discountAmount;
+            const savingsPercent = discountPercent;
+            
+            // Display results
+            document.getElementById('originalPriceDisplay').textContent = '$' + originalPrice.toFixed(2);
+            document.getElementById('discountAmount').textContent = '-$' + discountAmount.toFixed(2);
+            document.getElementById('finalPrice').textContent = '$' + finalPrice.toFixed(2);
+            document.getElementById('savingsPercent').textContent = savingsPercent.toFixed(0) + '%';
+            document.getElementById('savingsAmount').textContent = '$' + discountAmount.toFixed(2);
+            
+            // Update price comparison bars
+            const discountedPercent = 100 - discountPercent;
+            document.getElementById('discountedBar').style.width = discountedPercent + '%';
+            document.getElementById('discountedPercent').textContent = discountedPercent.toFixed(0) + '%';
+            
+            // Show results section
+            document.getElementById('results').classList.remove('hidden');
+            
+            // Animate savings badge
+            const savingsBadge = document.getElementById('savingsBadge');
+            savingsBadge.classList.remove('bg-green-100', 'border-green-200', 'text-green-700');
+            savingsBadge.classList.add('bg-green-50', 'border-green-100', 'text-green-600');
+            
+            setTimeout(() => {
+                savingsBadge.classList.remove('bg-green-50', 'border-green-100', 'text-green-600');
+                savingsBadge.classList.add('bg-green-100', 'border-green-200', 'text-green-700');
+            }, 300);
+        });
+        
+        // Reset form
+        document.getElementById('discountForm').addEventListener('reset', function() {
+            document.getElementById('results').classList.add('hidden');
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+            document.getElementById('discountedBar').style.width = '0%';
+            document.getElementById('discountedPercent').textContent = '0%';
+        });
+    </script>
+</body>
+</html>
