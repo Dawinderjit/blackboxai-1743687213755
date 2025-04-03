@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Calculator | Calculator Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .input-error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold">Calculator Hub</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="bg-blue-600 text-white p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 p-3 rounded-full">
+                        <i class="fas fa-clock text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Time Calculator</h1>
+                        <p class="opacity-90">Calculate time differences and perform time arithmetic</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Form -->
+            <div class="p-6">
+                <form id="timeForm" class="space-y-6">
+                    <div>
+                        <label for="calculationType" class="block text-sm font-medium text-gray-700 mb-1">Calculation Type</label>
+                        <select id="calculationType" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="difference">Time Difference</option>
+                            <option value="addSubtract">Add/Subtract Time</option>
+                        </select>
+                    </div>
+
+                    <div id="timeDifferenceInputs">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="startTime" class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                                <input type="time" id="startTime" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="08:00">
+                            </div>
+                            <div>
+                                <label for="endTime" class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                                <input type="time" id="endTime" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="17:00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="addSubtractInputs" class="hidden">
+                        <div>
+                            <label for="baseTime" class="block text-sm font-medium text-gray-700 mb-1">Base Time</label>
+                            <input type="time" id="baseTime" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="12:00">
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-4">
+                            <div>
+                                <label for="hoursToAdd" class="block text-sm font-medium text-gray-700 mb-1">Hours</label>
+                                <input type="number" id="hoursToAdd" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0">
+                            </div>
+                            <div>
+                                <label for="minutesToAdd" class="block text-sm font-medium text-gray-700 mb-1">Minutes</label>
+                                <input type="number" id="minutesToAdd" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0">
+                            </div>
+                            <div>
+                                <label for="secondsToAdd" class="block text-sm font-medium text-gray-700 mb-1">Seconds</label>
+                                <input type="number" id="secondsToAdd" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                            Calculate
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="mt-8 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Results</h2>
+                    <div class="space-y-4">
+                        <div id="differenceResult" class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600">Time Difference:</span>
+                            <span id="timeDifference" class="font-semibold">-</span>
+                        </div>
+                        <div id="newTimeResult" class="flex justify-between border-b pb-2 hidden">
+                            <span class="text-gray-600">Resulting Time:</span>
+                            <span id="calculatedTime" class="font-semibold">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Show/hide inputs based on calculation type
+        document.getElementById('calculationType').addEventListener('change', function() {
+            const type = this.value;
+            document.getElementById('timeDifferenceInputs').classList.toggle('hidden', type !== 'difference');
+            document.getElementById('addSubtractInputs').classList.toggle('hidden', type !== 'addSubtract');
+            document.getElementById('differenceResult').classList.toggle('hidden', type !== 'difference');
+            document.getElementById('newTimeResult').classList.toggle('hidden', type !== 'addSubtract');
+        });
+
+        // Calculate time differences
+        document.getElementById('timeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('calculationType').value;
+            
+            try {
+                if (type === 'difference') {
+                    const startTime = document.getElementById('startTime').value;
+                    const endTime = document.getElementById('endTime').value;
+                    
+                    if (!startTime || !endTime) {
+                        throw new Error('Please select valid times');
+                    }
+                    
+                    const start = new Date(`2000-01-01T${startTime}`);
+                    const end = new Date(`2000-01-01T${endTime}`);
+                    let diff = end - start;
+                    
+                    // Handle negative differences (overnight)
+                    if (diff < 0) {
+                        diff += 24 * 60 * 60 * 1000; // Add 24 hours
+                    }
+                    
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    document.getElementById('timeDifference').textContent = 
+                        `${hours}h ${minutes}m ${seconds}s`;
+                    document.getElementById('results').classList.remove('hidden');
+                } 
+                else if (type === 'addSubtract') {
+                    const baseTime = document.getElementById('baseTime').value;
+                    const hours = parseInt(document.getElementById('hoursToAdd').value) || 0;
+                    const minutes = parseInt(document.getElementById('minutesToAdd').value) || 0;
+                    const seconds = parseInt(document.getElementById('secondsToAdd').value) || 0;
+                    
+                    if (!baseTime) {
+                        throw new Error('Please select a base time');
+                    }
+                    
+                    const [baseHours, baseMinutes] = baseTime.split(':').map(Number);
+                    const date = new Date();
+                    date.setHours(baseHours, baseMinutes, 0);
+                    
+                    // Add/subtract time components
+                    date.setHours(date.getHours() + hours);
+                    date.setMinutes(date.getMinutes() + minutes);
+                    date.setSeconds(date.getSeconds() + seconds);
+                    
+                    // Format the resulting time
+                    const resultHours = date.getHours().toString().padStart(2, '0');
+                    const resultMinutes = date.getMinutes().toString().padStart(2, '0');
+                    const resultSeconds = date.getSeconds().toString().padStart(2, '0');
+                    
+                    document.getElementById('calculatedTime').textContent = 
+                        `${resultHours}:${resultMinutes}:${resultSeconds}`;
+                    document.getElementById('results').classList.remove('hidden');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+        
+        document.getElementById('timeForm').addEventListener('reset', function() {
+            document.getElementById('results').classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
